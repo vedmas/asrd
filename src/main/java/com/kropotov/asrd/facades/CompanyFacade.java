@@ -1,5 +1,7 @@
-package com.kropotov.asrd.controllers;
+package com.kropotov.asrd.facades;
 
+import com.kropotov.asrd.controllers.util.PageValues;
+import com.kropotov.asrd.controllers.util.PageWrapper;
 import com.kropotov.asrd.converters.company.*;
 import com.kropotov.asrd.dto.company.AddressDto;
 import com.kropotov.asrd.dto.company.CompanyDto;
@@ -14,6 +16,7 @@ import com.kropotov.asrd.services.springdatajpa.titles.company.CompanyPhoneServi
 import com.kropotov.asrd.services.springdatajpa.titles.company.CompanyService;
 import com.kropotov.asrd.services.springdatajpa.titles.company.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CompanyFasade {
+public class CompanyFacade {
 
     private final CompanyService companyService;
     private final AddressService addressService;
@@ -41,9 +44,12 @@ public class CompanyFasade {
     private List<AddressDto> addressDtos;
     private List<CompanyPhoneDto> companyPhoneDtos;
 
-    public List<CompanyDto> showCompanies() {
-
-        companyDtos = companyService.getAll().get().stream().map(company -> companyToDto.convert(company)).collect(Collectors.toList());
+    // Тут нужно переделать на dto, Я сделал просто чтобы работало
+    public List<CompanyDto> fillPage(Model model, Pageable pageable) {
+        //companyDtos = companyService.getAll().get().stream().map(company -> companyToDto.convert(company)).collect(Collectors.toList());
+        pageable = PageValues.getPageableOrDefault(pageable);
+        PageWrapper<Company> page = new PageWrapper<>(companyService.getAll(pageable.previousOrFirst()), "/companies");
+        PageValues.addContentToModel(model, page);
         return companyDtos;
     }
 
