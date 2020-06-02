@@ -5,7 +5,6 @@ import com.kropotov.asrd.entities.company.Company;
 import com.kropotov.asrd.repositories.company.AddressRepository;
 import com.kropotov.asrd.services.CrudService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +17,21 @@ public class AddressService implements CrudService<Address, Long> {
 
     private final AddressRepository addressRepository;
 
+    @Override
+    public Optional<List<Address>> getAll() {
+        if (addressRepository.findAll() == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(addressRepository.findAll());
+        }
+    }
+
+    @Override
     public Optional<Address> getById(Long id) {
         return addressRepository.findById(id);
     }
 
-    public List<Address> getAll() {
-        return addressRepository.findAll();
-    }
+
 
     @Transactional
     public Address save(Address address) {
@@ -33,10 +40,6 @@ public class AddressService implements CrudService<Address, Long> {
 
     @Override
     public void deleteById(Long id) {
-        addressRepository.deleteById(id);
-    }
-
-    public void delete(Long id) {
         addressRepository.deleteById(id);
     }
 

@@ -19,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +43,7 @@ public class CompanyFasade {
 
     public List<CompanyDto> showCompanies() {
 
-        companyDtos = companyService.getAll().stream().map(company -> companyToDto.convert(company)).collect(Collectors.toList());
+        companyDtos = companyService.getAll().get().stream().map(company -> companyToDto.convert(company)).collect(Collectors.toList());
         return companyDtos;
     }
 

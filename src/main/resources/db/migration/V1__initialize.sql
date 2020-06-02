@@ -395,21 +395,7 @@ CREATE TABLE device_components_docs
   DEFAULT CHARSET = utf8;
 
 
-DROP TABLE IF EXISTS `addresses`;
-CREATE TABLE `addresses` (
-                             `id` smallint unsigned NOT NULL AUTO_INCREMENT,
-                             `zip_code` varchar(255) NOT NULL,
-                             `city` varchar(255) NOT NULL,
-                             `street` varchar(255) NOT NULL,
-                             `place` varchar(255) NOT NULL,
-                             `company_id` smallint unsigned NOT NULL,
-                             `description` varchar(255) DEFAULT NULL,
-                             PRIMARY KEY (`id`),
-                             KEY `company_id_to_addresses_idx` (`company_id`),
-                             CONSTRAINT `company_id_to_addresses` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`)
-)ENGINE = InnoDB
- AUTO_INCREMENT = 1
- DEFAULT CHARSET = utf8;
+
 
 
 DROP TABLE IF EXISTS `companies`;
@@ -425,6 +411,21 @@ CREATE TABLE `companies` (
  AUTO_INCREMENT = 1
  DEFAULT CHARSET = utf8;
 
+DROP TABLE IF EXISTS `addresses`;
+CREATE TABLE `addresses` (
+                             `id` smallint unsigned NOT NULL AUTO_INCREMENT,
+                             `zip_code` varchar(255) NOT NULL,
+                             `city` varchar(255) NOT NULL,
+                             `street` varchar(255) NOT NULL,
+                             `place` varchar(255) NOT NULL,
+                             `company_id` smallint unsigned NOT NULL,
+                             `description` varchar(255) DEFAULT NULL,
+                             PRIMARY KEY (`id`),
+                             CONSTRAINT `company_id_to_addresses` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`)
+)ENGINE = InnoDB
+ AUTO_INCREMENT = 1
+ DEFAULT CHARSET = utf8;
+
 
 DROP TABLE IF EXISTS `company_phones`;
 
@@ -434,8 +435,7 @@ CREATE TABLE `company_phones` (
                                   `phone` varchar(255) NOT NULL,
                                   `description` varchar(255) DEFAULT NULL,
                                   PRIMARY KEY (`id`),
-                                  KEY `FK_company_phone_company` (`company_id`),
-                                  CONSTRAINT `copmany_id_to_phone` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`)
+                                  CONSTRAINT `FK_company_phone_company` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`)
 )ENGINE = InnoDB
  AUTO_INCREMENT = 1
  DEFAULT CHARSET = utf8;
@@ -797,7 +797,7 @@ CREATE TABLE device_letter
 
 DROP TABLE IF EXISTS device_component_letter;
 
-CREATE TABLE device_component_leter
+CREATE TABLE device_component_letter
 (
     letter_id INT NOT NULL,
     device_component_id INT NOT NULL,
@@ -815,25 +815,25 @@ CREATE TABLE device_component_leter
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8;
 
+DROP TABLE IF EXISTS file_types;
 
 CREATE TABLE file_types (
-                            `id` int(11) NOT NULL,
+                            `id` int(11) NOT NULL AUTO_INCREMENT,
                             `title` varchar(255) NOT NULL,
                             `directory` varchar(255) NOT NULL,
                             PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS file;
+DROP TABLE IF EXISTS files;
 
 CREATE TABLE files (
-                       `id` int(11) NOT NULL,
+                       `id` int(11) NOT NULL AUTO_INCREMENT,
                        `title` varchar(255) NOT NULL,
                        `type_id` int(11) DEFAULT NULL,
                        `description` varchar(255) DEFAULT NULL,
                        PRIMARY KEY (`id`),
-                       KEY `fk_file_types_id_idx` (`type_id`),
                        CONSTRAINT `fk_file_type_id` FOREIGN KEY (`type_id`) REFERENCES `file_types` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS system_files;
 
@@ -841,9 +841,10 @@ CREATE TABLE system_files (
                               `system_id` int(11) NOT NULL,
                               `file_id` int(11) NOT NULL,
                               PRIMARY KEY (`system_id`,`file_id`),
-                              KEY `fk_system_files_file_id_idx` (`file_id`),
-                              CONSTRAINT `fk_system_files_file_id` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                              CONSTRAINT `fk_system_files_system_id` FOREIGN KEY (`system_id`) REFERENCES `systems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+                              CONSTRAINT `fk_system_files_file_id` FOREIGN KEY (`file_id`)
+                               REFERENCES `files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                              CONSTRAINT `fk_system_files_system_id` FOREIGN KEY (`system_id`)
+                               REFERENCES `systems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS device_files;
@@ -852,11 +853,11 @@ CREATE TABLE `device_files` (
                                 `device_id` int(11) NOT NULL,
                                 `file_id` int(11) NOT NULL,
                                 PRIMARY KEY (`device_id`,`file_id`),
-                                KEY `fk_device_files_file_id_idx` (`file_id`),
-                                CONSTRAINT `fk_device_files_device_id` FOREIGN KEY (`device_id`) REFERENCES `devices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                                CONSTRAINT `fk_device_files_file_id` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+                                CONSTRAINT `fk_device_files_device_id` FOREIGN KEY (`device_id`)
+                                 REFERENCES `devices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                CONSTRAINT `fk_device_files_file_id` FOREIGN KEY (`file_id`)
+                                 REFERENCES `files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 INSERT INTO roles (name)
 VALUES ('ROLE_USER'),
@@ -878,13 +879,6 @@ INSERT INTO users_roles (user_id, role_id)
 VALUES (1, 1),
        (1, 2),
        (1, 3);
-
-
-INSERT INTO invoices (number, invoice_date, path, from_company_id, destination_id, description, entity_status, user_id)
-VALUES ('000', '2019-1-12', '/home/intruder/invoice.pdf', '1', '2', 'Прибыл из пункта А в пункт Б', 1, '1');
-
-INSERT INTO acts_input_control (number, invoice_id, act_date, path, result, description, user_id)
-VALUES ('000', 1, '2019-1-12', '/home/intruder/invoice.pdf', 1, 'Все ок', 1);
 
 INSERT INTO topics (title, path)
 VALUES ('Тема 1', 'тема_1'),
@@ -966,7 +960,82 @@ VALUES ('СЧ 1 1', 1),
 
 INSERT INTO companies (title, email)
 VALUES ('тест 1', '1@bb'),
-       ('тест 2', '2@bb');
+       ('тест 2', '2@bb'),
+       ('тест 3', '2@bb'),
+       ('тест 4', '2@bb'),
+       ('тест 5', '2@bb'),
+       ('тест 7', '2@bb'),
+       ('тест 9', '2@bb'),
+       ('тест 11', '2@bb'),
+       ('тест 24', '2@bb'),
+       ('тест 6', '2@bb'),
+       ('тест 8', '2@bb'),
+       ('тест 35', '2@bb'),
+       ('тест 15', '2@bb'),
+       ('тест 12', '2@bb'),
+       ('тест 48', '2@bb'),
+       ('тест 54', '2@bb'),
+       ('тест 22', '2@bb'),
+       ('тест 17', '2@bb'),
+       ('тест 14', '2@bb'),
+       ('тест 23', '2@bb'),
+       ('тест 20', '2@bb'),
+       ('тест 18', '2@bb'),
+       ('тест 19', '2@bb'),
+       ('тест 33', '2@bb'),
+       ('тест 0', '2@bb');
+
+
+
+INSERT INTO systems (title_system_id, number, purpose, purpose_passport, vintage, vp_number, accept_otk_date, accept_vp_date, user_id)
+VALUES  ('1', '0354501', 'Testing', 'not to crash', '2001-3-1', 45, '2001-3-1', '2000-1-1', '1'),
+        ('2', '0354502', 'Testing', 'not to crash', '2000-1-2', 45, '2000-1-2', '2000-1-1', '1'),
+        ('3', '035453', 'Testing', 'not to crash', '2001-1-1', 45, '2001-1-1', '2000-1-1', '1'),
+        ('4', '035454', 'Testing', 'not to crash', '2000-3-2', 45, '2000-3-2', '2000-1-1', '1'),
+        ('5', '0354515', 'Testing', 'not to crash', '2001-1-1', 45, '2001-1-1', '2000-1-1', '1'),
+        ('6', '0354516', 'Testing', 'not to crash', '2000-1-2', 45, '2000-1-2', '2000-1-1', '1'),
+        ('7', '0354527', 'Testing', 'not to crash', '2001-3-1', 45, '2001-3-1', '2000-1-1', '1'),
+        ('8', '0354528', 'Testing', 'not to crash', '2000-1-1', 45, '2000-1-1', '2000-1-1', '1'),
+        ('9', '0354529', 'Testing', 'not to crash', '2001-1-1', 45, '2001-1-1', '2000-1-1', '1'),
+        ('10', '0354530', 'Testing', 'not to crash', '2000-3-2', 45, '2000-3-2', '2000-1-1', '1'),
+        ('11', '0354531', 'Testing', 'not to crash', '2001-1-1', 45, '2001-1-1', '2000-1-1', '1'),
+        ('12', '0354512', 'Testing', 'not to crash', '2000-1-1', 45, '2000-1-1', '2000-1-1', '1'),
+        ('13', '0354513', 'Testing', 'not to crash', '2001-3-1', 45, '2001-3-1', '2000-1-1', '1'),
+        ('14', '0354594', 'Testing', 'not to crash', '2000-1-2', 45, '2000-1-2', '2000-1-1', '1'),
+        ('15', '0354595', 'Testing', 'not to crash', '2001-1-2', 45, '2001-1-2', '2000-1-1', '1'),
+        ('16', '0354566', 'Testing', 'not to crash', '2000-3-1', 45, '2000-3-1', '2000-1-1', '1'),
+        ('17', '0354577', 'Testing', 'not to crash', '2001-1-1', 45, '2001-1-1', '2000-1-1', '1'),
+        ('18', '0354578', 'Testing', 'not to crash', '2000-1-1', 45, '2000-1-1', '2000-1-1', '1'),
+        ('19', '0354579', 'Testing', 'not to crash', '2001-3-2', 45, '2001-3-2', '2000-1-1', '1'),
+        ('20', '0354520', 'Testing', 'not to crash', '2000-1-2', 45, '2000-1-2', '2000-1-1', '1'),
+        ('2', '0354522', 'Testing', 'not to crash', '2000-1-1', 45, '2000-1-1', '2000-1-1', '1');
+
+
+INSERT INTO devices (device_title_id, number, purpose, purpose_passport, system_id, vintage, vp_number, accept_otk_date, accept_vp_date, location, entity_status, created_at, updated_at, user_id)
+VALUES  (1, 666148838500, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (2, 666148838501, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (3, 666148838502, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (4, 666148838503, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (5, 666148838504, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (6, 666148838505, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (7, 666148838506, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (8, 666148838507, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (1, 666148838508, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (2, 666148838509, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (3, 666148838510, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (4, 666148838511, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (5, 666148838512, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (6, 666148838513, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (7, 666148838514, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (8, 666148838515, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (1, 666148838516, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (2, 666148838517, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (3, 666148838518, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (4, 666148838519, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (5, 666148838520, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (6, 666148838521, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1),
+        (7, 666148838522, 'Testing', 'not to crash', 1, '2000-1-2', 14, '2000-1-1', '2000-1-1', 0, 1, '2000-1-1', '2000-1-1', 1);
+
 
 INSERT INTO addresses (zip_code, city, street, place, company_id, description)
 VALUES ('123', 'Moscow', 'Tverskay', '125',1, 'test'),
@@ -1004,6 +1073,55 @@ VALUES  ('000', '2019-1-12', '/home/intruder/invoice.pdf', '1', '2', 'Прибы
         ('023', '2019-1-23', '/home/intruder/invoice6776.pdf', '2', '1', 'Прибыл из пункта Б в пункт А', 1, '1'),
         ('024', '2019-1-24', '/home/intruder/invoice5675.pdf', '1', '2', 'Прибыл из пункта А в пункт Б', 1, '1'),
         ('025', '2019-1-25', '/home/intruder/invoice5567.pdf', '2', '1', 'Прибыл из пункта Б в пункт А', 1, '1');
+
+INSERT INTO acts_input_control (number, invoice_id, act_date, path, result, description, user_id)
+VALUES
+('000', 2, '2020-2-20', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('001', 1, '2019-4-15', '/home/intruder/invoice1.pdf', 1, 'Все ок', 1),
+('002', 2, '2020-3-23', '/home/intruder/invoice2.pdf', 1, 'Все ок', 1),
+('003', 3, '2019-4-19', '/home/intruder/invoice3.pdf', 1, 'Все ок', 1),
+('004', 4, '2020-3-23', '/home/intruder/invoice4.pdf', 1, 'Все ок', 1),
+('005', 5, '2019-1-19', '/home/intruder/invoice5.pdf', 1, 'Все ок', 1),
+('006', 6, '2020-2-20', '/home/intruder/invoice6.pdf', 1, 'Все ок', 1),
+('008', 7, '2019-4-15', '/home/intruder/invoice8.pdf', 1, 'Все ок', 1),
+('007', 8, '2020-3-23', '/home/intruder/invoice7.pdf', 1, 'Все ок', 1),
+('019', 9, '2019-4-19', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('018', 10, '2020-3-23', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('017', 11, '2019-4-15', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('016', 12, '2020-2-20', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('015', 13, '2019-1-19', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('014', 14, '2020-3-21', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('013', 15, '2019-4-15', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('012', 16, '2020-3-21', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('011', 17, '2019-4-19', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('010', 19, '2020-2-20', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('024', 23, '2019-4-15', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('023', 26, '2020-3-23', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('035', 25, '2019-1-19', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('026', 20, '2020-3-23', '/home/intruder/invoice.pdf', 1, 'Все ок', 1),
+('027', 21, '2019-4-15', '/home/intruder/invoice.pdf', 1, 'Все ок', 1);
+
+INSERT INTO system_titles (title, path)
+VALUES ('Система 1', 'система_1'),
+       ('Система 2', 'система_2'),
+       ('Система 3', 'система_3'),
+       ('Система 4', 'система_4'),
+       ('Система 5', 'система_5'),
+       ('Система 6', 'система_6'),
+       ('Система 7', 'система_7'),
+       ('Система 8', 'система_8'),
+       ('Система 9', 'система_9'),
+       ('Система 10', 'система_10'),
+       ('Система 11', 'система_11'),
+       ('Система 12', 'система_12'),
+       ('Система 13', 'система_13'),
+       ('Система 14', 'система_14'),
+       ('Система 15', 'система_15'),
+       ('Система 16', 'система_16'),
+       ('Система 17', 'система_17'),
+       ('Система 18', 'система_18'),
+       ('Система 19', 'система_19'),
+       ('Система 20', 'система_20');
 
 INSERT INTO employees (name, last_name, patronymic, position, email, work_phone, mobil_phone, company_id)
 VALUES ('Vasyl', 'Petrov', 'Ivanych', 'boss','123@bb', '123456','2232445',1),

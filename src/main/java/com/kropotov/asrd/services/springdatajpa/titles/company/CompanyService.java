@@ -6,6 +6,8 @@ import com.kropotov.asrd.entities.company.Company;
 import com.kropotov.asrd.repositories.company.CompanyRepository;
 import com.kropotov.asrd.services.CrudService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +21,29 @@ public class CompanyService implements CrudService<Company, Long> {
     private final CompanyRepository companyRepository;
     private final CompanyToDto companyToDto;
 
-    public Optional<Company> getById(Long id){
+    public Optional<Company> getById(Long id) {
         return companyRepository.findById(id);
     }
 
-    public List<Company> getAll(){
-        return companyRepository.findAll();
+    @Override
+    public Optional<List<Company>> getAll() {
+        if (companyRepository.findAll() == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(companyRepository.findAll());
+        }
     }
 
-    public Company getOneByTitle(String title){
+    public Page<Company> getAll(Pageable pageable) {
+        return companyRepository.findAll(pageable);
+    }
+
+    public Company getOneByTitle(String title) {
         return companyRepository.findOneByTitle(title);
     }
 
     @Transactional
-    public Company save(Company company){
+    public Company save(Company company) {
         return companyRepository.save(company);
     }
 
@@ -41,7 +52,7 @@ public class CompanyService implements CrudService<Company, Long> {
         companyRepository.deleteById(id);
     }
 
-    public List<Company> getByMilitaryRepresentation(String militaryRepresentation){
+    public List<Company> getByMilitaryRepresentation(String militaryRepresentation) {
         return companyRepository.findByMilitaryRepresentation(militaryRepresentation);
     }
 

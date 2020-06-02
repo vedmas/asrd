@@ -1,6 +1,9 @@
-package com.kropotov.asrd.entities;
+package com.kropotov.asrd.dto;
 
 
+import com.kropotov.asrd.entities.Role;
+import com.kropotov.asrd.entities.StatusUser;
+import com.kropotov.asrd.entities.User;
 import com.kropotov.asrd.validation.FieldMatch;
 import com.kropotov.asrd.validation.ValidEmail;
 import lombok.Data;
@@ -42,6 +45,8 @@ public class SystemUser {
     @Size(min = 1, message = "is required")
     private String patronymic;
 
+    @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private Collection<Role> roles;
 
     @ValidEmail
@@ -53,6 +58,8 @@ public class SystemUser {
 
     private String mobilePhone;
 
+    @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private StatusUser statusUser;
 
     public SystemUser(User user) {

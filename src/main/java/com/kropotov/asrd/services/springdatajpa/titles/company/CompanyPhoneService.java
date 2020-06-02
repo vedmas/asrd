@@ -17,10 +17,17 @@ public class CompanyPhoneService implements CrudService<CompanyPhone, Long> {
 
     private final CompanyPhoneRepository companyPhoneRepository;
 
-    public List<CompanyPhone> getAll() {
-        return companyPhoneRepository.findAll();
+
+    @Override
+    public Optional<List<CompanyPhone>> getAll() {
+        if (companyPhoneRepository.findAll() == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(companyPhoneRepository.findAll());
+        }
     }
 
+    @Override
     public Optional<CompanyPhone> getById(Long id) {
         return companyPhoneRepository.findById(id);
     }
