@@ -2,6 +2,7 @@ package com.kropotov.asrd.services.springdatajpa.items;
 
 import com.kropotov.asrd.converters.items.ControlSystemToDto;
 import com.kropotov.asrd.dto.items.ControlSystemDto;
+import com.kropotov.asrd.entities.History;
 import com.kropotov.asrd.entities.items.ControlSystem;
 import com.kropotov.asrd.entities.titles.SystemTitle;
 import com.kropotov.asrd.repositories.SystemRepository;
@@ -23,6 +24,7 @@ public class SystemService implements CrudService<ControlSystem, Long> {
 
     private final SystemRepository systemRepository;
     private final ControlSystemToDto controlSystemToDto;
+//    private final HistoryRepository historyRepository;
 
 
     public Page<ControlSystem> getAll(Pageable pageable) {
@@ -38,6 +40,7 @@ public class SystemService implements CrudService<ControlSystem, Long> {
         return id == null ? Optional.empty() : systemRepository.findById(id);
     }
 
+    @Transactional
     public ControlSystem save(ControlSystem system) {
         return systemRepository.save(system);
     }
@@ -46,7 +49,7 @@ public class SystemService implements CrudService<ControlSystem, Long> {
         return systemRepository.findByNumberAndTitle(number, title);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ControlSystemDto getDtoById(Long id) {
         return controlSystemToDto.convert(getById(id).orElse(new ControlSystem()));
     }
@@ -54,5 +57,9 @@ public class SystemService implements CrudService<ControlSystem, Long> {
     @Override
     public void deleteById(Long id) {
         systemRepository.deleteById(id);
+    }
+
+    public List<History> getHistoryById(Long id) {
+        return systemRepository.getHistoryById(id);
     }
 }
