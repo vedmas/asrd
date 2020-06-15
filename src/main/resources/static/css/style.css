@@ -16,3 +16,8 @@
     color: red;
     font-weight: bold;
 }
+
+.conf_email {
+    padding-top: 70px;
+    padding-bottom: 10px;
+}
