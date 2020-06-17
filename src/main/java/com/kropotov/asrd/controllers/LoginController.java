@@ -13,9 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
@@ -42,8 +40,7 @@ public class LoginController {
     @PostMapping("/emailConfirm")
     public String confirmEmailUser(@ModelAttribute("emailConfirmPassword") EmailConfirmPassword emailConfirmPassword,
                                    Model theModel,
-                                   BindingResult theBindingResult,
-                                   RedirectAttributes redirectAttributes)
+                                   BindingResult theBindingResult)
             throws NoSuchProviderException, NoSuchAlgorithmException {
         SystemUser systemUser = new SystemUser();
         if(theBindingResult.hasErrors()) {
@@ -58,6 +55,7 @@ public class LoginController {
             }
             else {
                 theModel.addAttribute("msgSend", true);
+                theModel.addAttribute("codeBad", true);
                 theModel.addAttribute("systemUser", systemUser);
                 log.info("email = {}, confirmPassword = {}", emailConfirmPassword.getEmailConfirm(), emailConfirmPassword.getPasswordConfirm());
                 return "/login";

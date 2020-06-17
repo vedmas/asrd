@@ -2,10 +2,7 @@ package com.kropotov.asrd.controllers;
 
 
 import com.kropotov.asrd.dto.SystemUser;
-import com.kropotov.asrd.entities.User;
 import com.kropotov.asrd.services.UserService;
-import com.kropotov.asrd.services.email.EmailMessage;
-import com.kropotov.asrd.services.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;

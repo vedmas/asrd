@@ -108,8 +108,8 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        else if(user.getStatusUser().getName().equals("not confirmed")) {
-            throw new BadCredentialsException("User \"" + user.getUserName() + "\"  not confirmed");
+        else if(user.getStatusUser().getName().equals("confirmed")) {
+            throw new BadCredentialsException("User \"" + user.getUserName() + "\"  confirmed");
         }
         else if(user.getStatusUser().getName().equals("inactive")) {
             throw new BadCredentialsException("User \"" + user.getUserName() + "\"  not activated");
