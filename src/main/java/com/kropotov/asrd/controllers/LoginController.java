@@ -33,6 +33,12 @@ public class LoginController {
         return "login";
     }
 
+    @GetMapping("/login/new")
+    public String showMyLoginPageNew() {
+        emailConfirmation.removeAll();
+        return "redirect:/login";
+    }
+
     @PostMapping("/emailConfirm")
     public String confirmEmailUser(@ModelAttribute("emailConfirmPassword") EmailConfirmPassword emailConfirmPassword,
                                    Model theModel,
@@ -44,7 +50,7 @@ public class LoginController {
             theModel.addAttribute("emailConfirmPassword", emailConfirmPassword);
             return "redirect:/login";
         }
-        else if (emailConfirmPassword.getPasswordConfirm() != null) {
+        else if (!emailConfirmation.isEmpty()) {
             if (emailConfirmation.findByPassAndEmail(emailConfirmPassword.getPasswordConfirm(), emailConfirmPassword.getEmailConfirm())) {
                 systemUser.setEmail(emailConfirmPassword.getEmailConfirm());
                 theModel.addAttribute("systemUser", systemUser);

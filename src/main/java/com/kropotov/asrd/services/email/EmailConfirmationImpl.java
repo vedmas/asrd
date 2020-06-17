@@ -19,10 +19,9 @@ public class EmailConfirmationImpl implements EmailConfirmation {
     }
 
     @Override
-    public boolean addValuePassAndEmail(Integer password, String emailVerified) {
+    public void addValuePassAndEmail(Integer password, String emailVerified) {
         emailConfirmationMap.clear();
         emailConfirmationMap.put(password, emailVerified);
-        return !emailConfirmationMap.isEmpty();
     }
 
     @Override
@@ -34,5 +33,10 @@ public class EmailConfirmationImpl implements EmailConfirmation {
     public boolean findByPassAndEmail(Integer password, String emailVerified) {
        return emailConfirmationMap.entrySet().stream()
                .anyMatch(entry -> entry.getKey().equals(password) && entry.getValue().equals(emailVerified));
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return emailConfirmationMap.isEmpty();
     }
 }
